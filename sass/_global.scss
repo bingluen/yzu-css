@@ -1,0 +1,11 @@
+#MainContainer {
+  margin: 0 auto;
+  > .content {
+    @include calc('margin-top', '40px + 2%');
+  }
+}
+
+.content {
+  width: 80%;
+  margin: 0 auto;
+}
