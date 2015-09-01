@@ -70,7 +70,7 @@ var CourseSelection = React.createClass({
           <SearchCourse handleAddCourse={this.handleAddCourse}/>
         </div>
 
-        <div className="ui bottom attached tab segment" data-tabe="about">
+        <div className="ui bottom attached tab segment" data-tab="about">
           <div className="header">
             關於
           </div>
@@ -100,27 +100,33 @@ var CourseSelection = React.createClass({
             </div>
           </div>
           <h4>原始碼與授權</h4>
-          <div className="ui bulleted list">
-            <div className="item">
-              <i className="large github middle aligned icon"></i>
-              <div className="content">
-                <a className="header"
-                  href="https://github.com/erickson-makotoki/yzu-css">
-                  Source code on Github
-                </a>
-                <div className="description">可以由Github上觀看source code</div>
+          <div className="ui list">
+            <div className="ui items">
+              <div className="item">
+                <div className="ui mini image">
+                  <i className="big github icon"></i>
+                </div>
+                <div className="content">
+                  <div className="header">Source code on Github</div>
+                  <div className="description">
+                    <p>可以由Github上觀看source code</p>
+                    <p><a href="https://github.com/erickson-makotoki/yzu-css">https://github.com/erickson-makotoki/yzu-css</a></p>
+                  </div>
+                </div>
+              </div>
+              <div className="item">
+                <div className="ui mini image">
+                  <i className="big code icon"></i>
+                </div>
+                <div className="content">
+                  <div className="header">MIT 授權</div>
+                  <div className="description">
+                    <p>可參閱<a href="http://www.openfoundry.org/tw/licenses/34-mit-licensemit">http://www.openfoundry.org/tw/licenses/34-mit-licensemit</a></p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="item">
-              <i className="large Code middle aligned icon"></i>
-              <div className="content">
-                <a className="header">
-                  MIT
-                </a>
-                <div className="description">可參閱<a href="http://www.openfoundry.org/tw/licenses/34-mit-licensemit">http://www.openfoundry.org/tw/licenses/34-mit-licensemit</a></div>
-              </div>
 
-            </div>
           </div>
         </div>
 
