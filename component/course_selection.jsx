@@ -568,10 +568,12 @@ var SearchForm = React.createClass({
           <div className="field">
             <label>資料庫最後更新時間</label>{this.props.updateTime}
           </div>
-          <div className="ui buttons right floated">
-            <button type="reset" className="ui button reset" onClick={this.handleReset}>Reset</button>
-            <div className="or"></div>
-            <button type="submit" className="ui positive button">Search</button>
+          <div className="field right aligned">
+            <div className="ui buttons">
+              <button type="reset" className="ui button reset" onClick={this.handleReset}>Reset</button>
+              <div className="or"></div>
+              <button type="submit" className="ui positive button">Search</button>
+            </div>
           </div>
       </form>
     )
