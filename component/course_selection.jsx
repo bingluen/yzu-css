@@ -405,13 +405,13 @@ var SearchCourse = React.createClass({
   handleSearchFormSubmit: function(keys) {
     var result = this.state.courseData.course;
 
-    if(keys.department) {
+    if(keys.department && keys.department != "0") {
       result = result.filter(function(element, index, array) {
         return element.department == keys.department;
       });
     }
 
-    if(keys.degree) {
+    if(keys.degree && key.degree != "0") {
       result = result.filter(function(element, index, array) {
         return element.degree == keys.degree;
       });
