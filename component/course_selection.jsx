@@ -22,6 +22,13 @@ var CourseSelection = React.createClass({
       for(var j = 0; j < list[i].courseTime.length; j++)
       {
         if (course.courseTime.indexOf(list[i].courseTime[j]) >= 0) {
+          $('#conflictCourse')
+            .append('<p>欲加選的課程：<br/>')
+            .append(course.courseTime.toString() + ' : ' + course.courseName)
+            .append('</p><p>已與課表上下列課程時間重疊：<br/>')
+            .append(list[i].courseTime.toString() + ' : ' + list[i].courseName)
+            .append('</p>')
+          ;
 
           $('.ui.modal.conflictWarning')
             .modal('show')
@@ -32,17 +39,30 @@ var CourseSelection = React.createClass({
     }
     return false;
   },
-  handleAddCourse: function(course) {
+  handleAddCourse: function(course, button) {
     var list = this.state.list;
     if(!this.isConflictCheck(list, course)) {
       list.push(course);
       this.setState({list: list});
+
+      //button Animation
+      setTimeout(function () {
+        button
+          .html('Added')
+          .addClass('disabled')
+        ;
+      }, 600);
     }
+    setTimeout(function () {
+      button
+        .removeClass('loading')
+      ;
+    }, 600);
   },
   handleDelete: function(uid) {
     this.setState({
       list: this.state.list.filter(function(element) {
-        return element.uid != uid;
+        return element.courseUid != uid;
       })
     });
   },
@@ -58,7 +78,7 @@ var CourseSelection = React.createClass({
         </div>
         <div className="ui top attached secondary pointing menu">
           <a className="active item" data-tab="schedule">我的課表</a>
-          <a className="item" data-tab="search">Search</a>
+          <a className="item" data-tab="search">搜尋課程</a>
           <a className="item" data-tab="about">About</a>
         </div>
         <div className="ui bottom attached tab segment active content" data-tab="schedule">
@@ -71,10 +91,64 @@ var CourseSelection = React.createClass({
         </div>
 
         <div className="ui bottom attached tab segment" data-tab="about">
-          <div className="header">
+          <h2 className="ui dividing header">
             關於
+          </h2>
+          <h3 className="ui header">作者</h3>
+          <div className="ui list">
+            <div className="item">
+              <img className="ui avatar image" src="http://www.gravatar.com/avatar/7bc81b728640a4917ec3b6625d16425e" />
+              <div className="content">
+                <a className="header">Erickson Juang</a>
+                <div className="description">資訊工程學系102級(104~)、電機工程學系101級(101~103)</div>
+              </div>
+            </div>
           </div>
-          <h4>注意事項</h4>
+          <h3 className="ui header">更新資訊</h3>
+          <ul>
+
+            <li>
+
+                2015-09-10
+
+                <ul>
+
+                  <li>
+                      更新資料庫 （節戳時間為2015-09-09 22:38:53）
+                  </li>
+
+                  <li>
+                      衝堂提醒增加列出衝堂課名與時間
+                  </li>
+
+                  <li>
+                      課程資料增加上課地點
+                  </li>
+
+                  <li>
+                      課表中顯示課號與上課地點
+                  </li>
+
+                  <li>
+                      按下「Add」後，按鈕改為disabled
+                  </li>
+
+                  <li>
+                      更改UI文字
+                  </li>
+
+                  <li>
+                      統計已選學分數
+                  </li>
+
+                </ul>
+
+            </li>
+
+
+          </ul>
+
+          <h3 className="ui header">注意事項</h3>
           <div className="ui bulleted list">
             <div className="item">
               課程資訊僅供參考，實際資訊請參閱
@@ -84,7 +158,7 @@ var CourseSelection = React.createClass({
               。
             </div>
           </div>
-          <h4>使用的Framework</h4>
+          <h3 className="ui header">使用的Framework</h3>
           <div className="ui bulleted list">
             <div className="item">
               React 0.13.3
@@ -99,7 +173,7 @@ var CourseSelection = React.createClass({
               jQuery
             </div>
           </div>
-          <h4>原始碼與授權</h4>
+          <h3 className="ui header">原始碼與授權</h3>
           <div className="ui list">
             <div className="ui items">
               <div className="item">
@@ -141,6 +215,9 @@ var CourseSelection = React.createClass({
             </div>
             <div className="description">
               <p>此課程開課時間，和你已經選的課有重疊喔！</p>
+              <div id="conflictCourse">
+
+              </div>
             </div>
           </div>
           <div className="actions">
@@ -183,6 +260,7 @@ var CourseTable = React.createClass({
         ],
         days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
       },
+      creditCount: 0
     })
   },
   handleDaysChange: function(event) {
@@ -199,7 +277,9 @@ var CourseTable = React.createClass({
   refreshData: function(courseList) {
 
     var extendCourse = {}
+    var creditCount = 0
     courseList.map(function(element) {
+      creditCount += element.credit
       element.courseTime.map(function(value) {
         /* 若課表天數不夠，自動增加 */
         if( Math.floor(value / 100) > this.state.day ) {
@@ -217,7 +297,7 @@ var CourseTable = React.createClass({
         extendCourse[Math.floor(value / 100 - 1).toString()][(value % 100 - 1).toString()] = element;
       }.bind(this));
     }.bind(this));
-    this.setState({rawData: courseList, extendData: extendCourse});
+    this.setState({rawData: courseList, extendData: extendCourse, creditCount: creditCount});
   },
   componentWillReceiveProps: function(nextProps) {
     this.refreshData(nextProps.courseList);
@@ -230,8 +310,8 @@ var CourseTable = React.createClass({
       return (<option key={currentValue} value={currentValue}>{currentValue}</option>)
     }.bind(this));
 
-    var lessonsOption = [10, 11, 12, 13].map(function(currentValue) {
-      return (<option key={currentValue} value={currentValue}>{currentValue}</option>)
+    var lessonsOption = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map(function(currentValue) {
+      return (<option key={currentValue} value={currentValue}>{currentValue} ({this.state.label.times[currentValue - 1].split('-')[1]}結束)</option>)
 
     }.bind(this));
 
@@ -259,7 +339,7 @@ var CourseTable = React.createClass({
      *
      */
 
-    var rows =this.state.label.times.map(function (currentValue, RowIndex) {
+    var rows = this.state.label.times.map(function (currentValue, RowIndex) {
 
       if(RowIndex + 1 > this.state.row) return null;
       /**
@@ -270,7 +350,7 @@ var CourseTable = React.createClass({
        */
       fields = Array.apply(null, Array(this.state.day)).map(function(element, index) {
         if(this.state.extendData && this.state.extendData[index.toString()] && this.state.extendData[index.toString()][RowIndex.toString()])
-          return (<CourseTableDataField key={index + 1} course={this.state.extendData[index.toString()][RowIndex.toString()]} handleDelete={this.handleDelete} />)
+          return (<CourseTableDataField key={index + 1} course={this.state.extendData[index.toString()][RowIndex.toString()]} handleDelete={this.handleDelete} fieldKey={ (index + 1).toString() + ((RowIndex + 1) >= 10 ? (RowIndex + 1).toString() : '0' + (RowIndex + 1))} />)
         return (<CourseTableDataField key={index + 1} />)
       }.bind(this))
       fields.unshift(<td key={0} className="center aligned"><p key={0}>第 {RowIndex + 1} 節</p><p key={1}>{currentValue}</p></td>)
@@ -288,21 +368,25 @@ var CourseTable = React.createClass({
               <select defaultValue={this.state.day} className="ui dropdown daysOption">
                 {daysOption}
               </select>
-              <label>Days per Week</label>
+              <label>一週上課幾天？</label>
             </div>
             <div className="field">
               <select defaultValue={this.state.row} className="ui dropdown lessonsOption">
                 {lessonsOption}
               </select>
-              <label>Lessons per Day</label>
+              <label>一天最多幾節課？</label>
             </div>
-
             <div className="field">
               <div className="teal ui button generatingURL"
                 onClick={this.generatingURL}
                 data-content="匯出課表，下次可以由該網址繼續編輯。">產生網址</div>
             </div>
           </div>
+        </div>
+        <div className="ui green message">
+          <p>已選學分數：{this.state.creditCount}</p>
+          <p>一般生選課上限為25學分，符合資格者（如雙主修、輔系、跨學程領域等）上限為31學分</p>
+          <p>大一～大三生選課下限至少16學分，大四生至少9學分</p>
         </div>
 
 
@@ -364,6 +448,9 @@ var CourseTable = React.createClass({
  * Course Name
  * Teacher Name
  * Time
+ * Classroom
+ * Class number (ex. A, B, C and etc.)
+ * Credit
  */
 var CourseTableDataField = React.createClass({
   render: function() {
@@ -371,7 +458,15 @@ var CourseTableDataField = React.createClass({
       return(
         <td>
           <div className="right aligned"><a href="#" onClick={this.handleDelete}><i className="close icon"></i></a></div>
-          <p className="center aligned">{this.props.course.courseName}<br/>{this.props.course.teacherName}</p>
+          <p className="center aligned">
+            {this.props.course.courseCode + ' ' + this.props.course.classNumber}
+            <br/>
+            {this.props.course.courseName}
+            <br/>
+            {this.props.course.teacherName}
+            <br/>
+            {this.props.course.classroom[this.props.fieldKey]}
+          </p>
         </td>
       );
     } else {
@@ -379,7 +474,7 @@ var CourseTableDataField = React.createClass({
     }
   },
   handleDelete: function() {
-    this.props.handleDelete(this.props.course.uid);
+    this.props.handleDelete(this.props.course.courseUid);
   }
 });
 
@@ -437,7 +532,7 @@ var SearchCourse = React.createClass({
 
     this.setState({result: result});
   },
-  handleCourseAdd: function(course) {
+  handleCourseAdd: function(course, button) {
     /**
      * Data Obj format: (column name)
      * course uid
@@ -445,14 +540,23 @@ var SearchCourse = React.createClass({
      * Course Name
      * Teacher Name
      * Time
+     * Classroom
+     * Class number (ex. A, B, C and etc.)
+     * Credit
      */
+
+    //Pass to parent Node to add
     this.props.handleAddCourse({
       courseUid:course.uid,
       courseCode:course.code,
       courseName:course.chinese_name,
       teacherName:course.teacher,
-      courseTime:course.time.split(',').map(function(element) { return parseInt(element) })
-    })
+      courseTime:course.time.split(',').map(function(element) { return parseInt(element) }),
+      classroom:course.classroom,
+      classNumber:course.class,
+      credit:course.credit
+
+    }, button)
   },
   render: function() {
     if (!this.state.courseData) return null;
@@ -522,6 +626,10 @@ var SearchForm = React.createClass({
       this.props.handleSubmit(keys);
     else
       $('form').addClass('error');
+
+    //reset all button
+    $('button[class="ui green basic button disabled"]').html('Add');
+    $('button[class="ui green basic button disabled"]').removeClass('disabled');
   },
   render: function() {
     var Department = this.props.department.map(function(element, index) {
@@ -594,7 +702,11 @@ var SearchForm = React.createClass({
 
 var SearchResult = React.createClass({
   handleAdd: function(course) {
-    this.props.handleAdd(course);
+    var addButton = $(React.findDOMNode(this.refs['result-' + course.uid]));
+    //load Animation
+    addButton.addClass('loading');
+    //pass to parent Node
+    this.props.handleAdd(course, addButton);
   },
   render: function() {
     if(!this.props.result) return null;
@@ -609,7 +721,7 @@ var SearchResult = React.createClass({
             <td>{element.credit}</td>
             <td>{element.time}</td>
             <td>{element.degree}</td>
-            <td><div className="ui basic olive button" onClick={this.handleAdd.bind(this, element)}>Add</div></td>
+            <td><button className="ui green basic button" onClick={this.handleAdd.bind(this, element)} ref={"result-" + element.uid}>Add</button></td>
           </tr>
         )
       }.bind(this));
