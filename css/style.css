@@ -1,0 +1,16 @@
+#MainContainer {
+  margin: 0 auto;
+}
+#MainContainer > .content {
+  margin-top: -webkit-calc(40px + 2%);
+  margin-top: calc(40px + 2%);
+}
+
+.content {
+  width: 80%;
+  margin: 0 auto;
+}
+
+#CourseTable {
+  width: 100%;
+}
