@@ -108,6 +108,13 @@ var CourseSelection = React.createClass({
           <ul>
 
             <li>
+              2015-12-09
+              <ul>
+                <li>更新為1042學期資料庫</li>
+              </ul>
+            </li>
+
+            <li>
 
                 2015-09-10
 
