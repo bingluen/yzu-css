@@ -481,7 +481,7 @@ var CourseTableDataField = React.createClass({
 var SearchCourse = React.createClass({
   getInitialState: function() {
     $.ajax({
-      url: 'course_database.json',
+      url: 'database104-2.json',
       type: 'get',
       dataType: 'json'
 
