@@ -23,6 +23,7 @@ var CourseSelection = React.createClass({
       {
         if (course.courseTime.indexOf(list[i].courseTime[j]) >= 0) {
           $('#conflictCourse')
+            .empty()
             .append('<p>欲加選的課程：<br/>')
             .append(course.courseTime.toString() + ' : ' + course.courseName)
             .append('</p><p>已與課表上下列課程時間重疊：<br/>')
